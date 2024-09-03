@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Medios"
+rootProject.name = "TikCloneSwipe"
 include(":app")
  
