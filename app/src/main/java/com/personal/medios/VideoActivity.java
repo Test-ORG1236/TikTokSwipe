@@ -18,7 +18,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.personal.medios.VideoUtils.ObjetoMedia;
 import com.personal.medios.api.FeedModel;
 import com.personal.medios.api.FeedPageModel;
-import com.personal.medios.api.PageResponseModel;
 import com.personal.medios.api.RetrofitController;
 import com.personal.medios.api.UserModel;
 
@@ -89,7 +88,7 @@ import retrofit2.Response;
         @Override
         public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 //            return new VideoViewHolder(,apiController, feed.get(position));
-            return new VideoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_video, parent, false));
+            return new VideoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.post_view, parent, false));
         }
         @Override
         public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
