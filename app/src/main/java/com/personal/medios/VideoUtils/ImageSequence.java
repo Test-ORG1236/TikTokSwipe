@@ -9,7 +9,7 @@ public class ImageSequence extends ObjetoMedia{
     private String author, title;
     private int currentIndex = 0;
     public ImageSequence(List<Uri> ImagesUris, String author, String title, int likes){
-        super(ImagesUris.get(0), likes, author, title);
+        super(likes, author, title);
         this.ImagesUris = ImagesUris;
 
     }

@@ -8,8 +8,8 @@
     >
 
 
-    <VideoView
-        android:id="@+id/videoView"
+    <FrameLayout
+        android:id="@+id/content_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -100,7 +100,6 @@
         app:layout_constraintEnd_toEndOf="@id/heartImg"
         android:textColor="@color/white"
         android:textAlignment="center"
-        android:text="0"
         android:shadowColor="@color/shadow"
         android:shadowDx="2"
         android:shadowDy="1"

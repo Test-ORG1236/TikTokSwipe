@@ -3,30 +3,25 @@ package com.personal.medios;
 import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.personal.medios.VideoUtils.ObjetoMedia;
-import com.personal.medios.api.RetrofitController;
-public class VideoViewHolder extends RecyclerView.ViewHolder {
-    ObjetoMedia video;
+import com.personal.medios.VideoUtils.ObjetoVideo;
+
+public class VideoViewHolder extends PostHolder<ObjetoVideo> {
 
     VideoView vv;
-    TextView tvTituloVideo, tvAutorVideo, tvLikes;
     @SuppressLint("ClickableViewAccessibility")
     public VideoViewHolder(@NonNull View view){
         super(view);
-        vv = view.findViewById(R.id.videoView);
-        tvTituloVideo = view.findViewById(R.id.titulo_video);
-        tvAutorVideo = view.findViewById(R.id.autor_video);
-        tvLikes = view.findViewById(R.id.tvlikes);
-//        ImageView iv = view.findViewById(R.id.heartImg);
+        vv = new VideoView(view.getContext());
+        vv.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        this.contentContainer.addView(vv);
         vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -48,17 +43,12 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
 
 
 
-
-    public void setVideo(ObjetoMedia video){
-        Log.i("Swipe", "Creating video: " + video.getUri().toString());
-        this.video = video;
-        vv.setVideoURI(video.getUri());
-        tvTituloVideo.setText(video.getTitle());
-        tvAutorVideo.setText(video.getAuthor());
-        tvLikes.setText(String.valueOf(video.getLikes()));
-
-
-
+    @Override
+    public void setInfo(ObjetoVideo post){
+        Log.i("HolderDebug", "post: "+post);
+        super.setInfo(post);
+        vv.setVideoURI(post.getUri());
+        Log.i("Swipe", "Creating video: " + post.getUri().toString());
 
     }
 }

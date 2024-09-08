@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.personal.medios.VideoUtils.ObjetoMedia;
+import com.personal.medios.VideoUtils.ObjetoVideo;
 import com.personal.medios.api.FeedModel;
 import com.personal.medios.api.FeedPageModel;
 import com.personal.medios.api.RetrofitController;
@@ -88,6 +89,7 @@ import retrofit2.Response;
         @Override
         public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 //            return new VideoViewHolder(,apiController, feed.get(position));
+            Log.i("Swipe", "New holder with view type: "+ viewType);
             return new VideoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.post_view, parent, false));
         }
         @Override
@@ -105,7 +107,9 @@ import retrofit2.Response;
                 public void onResponse(Call<UserModel> call, Response<UserModel> response) {
                     UserModel um = response.body();
                     fm.setUserName(um.getName());
-                    holder.setVideo(new ObjetoMedia(fm.getVideoUri(apiController.getUrl()), fm.getLikes(), um.getName(), fm.getTitle()));
+                    holder.setInfo(
+                        new ObjetoVideo(fm.getLikes(), um.getName(), fm.getTitle(),fm.getVideoUri(apiController.getUrl()))
+                    );
                 }
 
                 @Override
