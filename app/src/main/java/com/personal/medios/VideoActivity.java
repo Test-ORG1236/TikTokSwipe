@@ -15,12 +15,14 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.personal.medios.VideoUtils.ObjetoMedia;
-import com.personal.medios.VideoUtils.ObjetoVideo;
-import com.personal.medios.api.FeedModel;
-import com.personal.medios.api.FeedPageModel;
+import com.personal.medios.api.models.FeedModel;
+import com.personal.medios.api.models.FeedPageModel;
 import com.personal.medios.api.RetrofitController;
-import com.personal.medios.api.UserModel;
+import com.personal.medios.api.models.UserModel;
+import com.personal.medios.post.PostHolder;
+import com.personal.medios.post.PostHolderFactory;
+import com.personal.medios.post.PostHolderFactoryManager;
+import com.personal.medios.post.VideoHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ import retrofit2.Response;
  public class VideoActivity extends FragmentActivity {
 
      private String nextCursor = null;
+     private boolean usedCursor = false;
      private ScreenSlidePagerAdapter pagerAdapter;
      static private RetrofitController apiController;
     @Override
@@ -55,29 +58,66 @@ import retrofit2.Response;
         viewPager.setAdapter(pagerAdapter);
         loadFeed();
 
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            private int myState;
+            private int currentPosition;
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (myState == ViewPager2.SCROLL_STATE_SETTLING) {
+                    Log.i("Swipe", "Settling: " + position + ", " + currentPosition);
+                    if (position==pagerAdapter.getItemCount()-1) loadFeed();
+                }
+                if (myState == ViewPager2.SCROLL_STATE_DRAGGING) {
+                    Log.i("Swipe", "Dragging: " + position + ", " + currentPosition);
+                }
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                currentPosition = position;
+                super.onPageSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                myState = state;
+                super.onPageScrollStateChanged(state);
+            }
+        });
     }
 
     public void loadFeed(){
         Call<FeedPageModel> callFeedPage;
-        if (nextCursor==null) callFeedPage = apiController.getVideoApi().getFeed();
-        else callFeedPage = apiController.getVideoApi().getFeed(nextCursor);
-
-        callFeedPage.enqueue(new Callback<FeedPageModel>() {
-            @Override
-            public void onResponse(Call<FeedPageModel> call, Response<FeedPageModel> response) {
-                FeedPageModel b = response.body();
-                nextCursor = b.getCursor_token();
-                for (FeedModel fm : b.getFeed())
-                    pagerAdapter.addFeed(fm);
+        if (!usedCursor) {
+            if (nextCursor == null) callFeedPage = apiController.getVideoApi().getFeed();
+            else {
+                callFeedPage = apiController.getVideoApi().getFeed(nextCursor);
+                usedCursor = true;
             }
 
-            @Override
-            public void onFailure(Call<FeedPageModel> call, Throwable t) {
+            callFeedPage.enqueue(new Callback<FeedPageModel>() {
+                @Override
+                public void onResponse(Call<FeedPageModel> call, Response<FeedPageModel> response) {
+                    FeedPageModel b = response.body();
+                    nextCursor = b.getCursor_token();
 
-            }
-        });
+                    usedCursor = false;
+                    for (FeedModel fm : b.getFeed()) {
+                        fm.setBaseUrl(apiController.getUrl());
+                        pagerAdapter.addFeed(fm);
+                    }
+                    pagerAdapter.notifyItemRangeInserted(pagerAdapter.getItemCount()-2,pagerAdapter.getItemCount());
+                }
+
+                @Override
+                public void onFailure(Call<FeedPageModel> call, Throwable t) {
+
+                }
+            });
+        }
     }
-    static private class ScreenSlidePagerAdapter extends RecyclerView.Adapter<VideoViewHolder> {
+    static private class ScreenSlidePagerAdapter extends RecyclerView.Adapter<PostHolder> {
 
         List<FeedModel> feed = new ArrayList<>();
         VideoActivity parent;
@@ -87,19 +127,26 @@ import retrofit2.Response;
 
         @NonNull
         @Override
-        public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public PostHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 //            return new VideoViewHolder(,apiController, feed.get(position));
             Log.i("Swipe", "New holder with view type: "+ viewType);
-            return new VideoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.post_view, parent, false));
+            PostHolderFactory factory = PostHolderFactoryManager.getFactory(viewType);
+            return factory.createPostHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.post_view, parent, false));
         }
-        @Override
-        public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
-            if (position == getItemCount()-1){
 
-                Log.i("Swipe", "Loading more feed");
-                parent.loadFeed();
-            }
+
+        @Override
+        public int getItemViewType(int position) {
+
             FeedModel fm = feed.get(position);
+            return FeedModel.types.indexOf(fm.getType());
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull PostHolder holder, int position) {
+
+            FeedModel fm = feed.get(position);
+
             Call<UserModel> userCall = apiController.getVideoApi().getUserById(fm.getUserId());
 
             userCall.enqueue(new Callback<UserModel>() {
@@ -107,9 +154,8 @@ import retrofit2.Response;
                 public void onResponse(Call<UserModel> call, Response<UserModel> response) {
                     UserModel um = response.body();
                     fm.setUserName(um.getName());
-                    holder.setInfo(
-                        new ObjetoVideo(fm.getLikes(), um.getName(), fm.getTitle(),fm.getVideoUri(apiController.getUrl()))
-                    );
+                    Log.i("SwipeDebug", "Type: "+fm.getType());
+                    holder.setInfo(fm);
                 }
 
                 @Override
@@ -120,7 +166,6 @@ import retrofit2.Response;
         }
         public void addFeed(FeedModel fm){
             feed.add(fm);
-            notifyDataSetChanged();
         }
         @Override
         public int getItemCount() {

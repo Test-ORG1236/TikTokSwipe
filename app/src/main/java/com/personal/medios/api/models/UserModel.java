@@ -1,4 +1,4 @@
-package com.personal.medios.api;
+package com.personal.medios.api.models;
 
 public class UserModel {
 

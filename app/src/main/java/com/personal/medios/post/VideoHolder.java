@@ -1,4 +1,4 @@
-package com.personal.medios;
+package com.personal.medios.post;
 
 import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
@@ -11,17 +11,16 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 
-import com.personal.medios.VideoUtils.ObjetoVideo;
+import com.personal.medios.api.models.FeedModel;
 
-public class VideoViewHolder extends PostHolder<ObjetoVideo> {
+public class VideoHolder extends PostHolder{
 
     VideoView vv;
     @SuppressLint("ClickableViewAccessibility")
-    public VideoViewHolder(@NonNull View view){
+    public VideoHolder(@NonNull View view){
         super(view);
         vv = new VideoView(view.getContext());
-        vv.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-        this.contentContainer.addView(vv);
+        setupView(vv);
         vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -44,8 +43,7 @@ public class VideoViewHolder extends PostHolder<ObjetoVideo> {
 
 
     @Override
-    public void setInfo(ObjetoVideo post){
-        Log.i("HolderDebug", "post: "+post);
+    public void setInfo(FeedModel post){
         super.setInfo(post);
         vv.setVideoURI(post.getUri());
         Log.i("Swipe", "Creating video: " + post.getUri().toString());

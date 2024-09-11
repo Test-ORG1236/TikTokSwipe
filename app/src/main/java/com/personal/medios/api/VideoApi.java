@@ -1,9 +1,15 @@
 package com.personal.medios.api;
 
+import com.personal.medios.api.models.AudioModel;
+import com.personal.medios.api.models.FeedModel;
+import com.personal.medios.api.models.FeedPageModel;
+import com.personal.medios.api.models.UserModel;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -19,4 +25,7 @@ public interface VideoApi {
 
     @GET("users/{userId}")
     Call<UserModel> getUserById(@Path(value = "userId", encoded = true) int userId);
+
+    @GET("users/{audioTrackId}")
+    Call<AudioModel> getAudioById(@Path(value = "audioTrackId", encoded = true) int audioTrackId);
 }
