@@ -8,28 +8,21 @@ import java.util.List;
 
 public class FeedModel extends MetaInfoModel {
     @Expose(deserialize = false)
-    private String userName, audioFile;
+    private String userName;
     private String type;
-    private int userId, audioTrackId, likes;
+    private int userId, likes;
     private List<String> files;
-
+    private AudioModel audio;
     public String getAsString(){
         return "ID: "+getId()+", titulo: "+getTitle();
     }
-    public String getAudioFile() {
-        return audioFile;
+
+    public AudioModel getAudio() {
+        return audio;
     }
 
-    public void setAudioFile(String audioFile) {
-        this.audioFile = audioFile;
-    }
-
-    public int getAudioTrackId() {
-        return audioTrackId;
-    }
-
-    public void setAudioTrackId(int audioTrackId) {
-        this.audioTrackId = audioTrackId;
+    public void setAudio(AudioModel audio) {
+        this.audio = audio;
     }
 
     public List<String> getFiles() {
@@ -90,5 +83,11 @@ public class FeedModel extends MetaInfoModel {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    @Override
+    public void setBaseUrl(String baseUrl) {
+        super.setBaseUrl(baseUrl);
+        if (audio != null) audio.setBaseUrl(baseUrl);
     }
 }

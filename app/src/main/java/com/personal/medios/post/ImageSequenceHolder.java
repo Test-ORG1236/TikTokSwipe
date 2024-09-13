@@ -1,39 +1,39 @@
 package com.personal.medios.post;
 
 import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.personal.medios.R;
+import com.personal.medios.api.RetrofitController;
+import com.personal.medios.api.models.AudioModel;
 import com.personal.medios.api.models.FeedModel;
 import com.squareup.picasso.Picasso;
 
-public class ImageSequenceHolder extends PostHolder{
+public class ImageSequenceHolder extends PostWithAudioHolder{
     ViewPager2 sequencePager;
     @SuppressLint("ClickableViewAccessibility")
-    public ImageSequenceHolder(@NonNull View view){
-        super(view);
+    public ImageSequenceHolder(@NonNull View view, PostHolderObservable observer, RetrofitController rtc){
+        super(view,observer, rtc);
         sequencePager = new ViewPager2(view.getContext());
         setupView(sequencePager);
 
     }
 
-
-
     @Override
     public void setInfo(FeedModel post){
         super.setInfo(post);
         sequencePager.setAdapter(new ImageSlidePagerAdapter(post));
+
     }
 
     private static class ImageSlidePagerAdapter extends RecyclerView.Adapter<ImageSlidePagerAdapter.ImageSlideHolder>{
@@ -52,7 +52,6 @@ public class ImageSequenceHolder extends PostHolder{
         @Override
         public void onBindViewHolder(@NonNull ImageSlideHolder holder, int position) {
             Uri u = sequence.getUri(position);
-            Log.i("SwipeDebug", "Adding uri: "+u.toString());
             Picasso.get()
                     .load(u)
 

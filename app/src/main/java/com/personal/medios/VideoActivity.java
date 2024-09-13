@@ -22,7 +22,7 @@ import com.personal.medios.api.models.UserModel;
 import com.personal.medios.post.PostHolder;
 import com.personal.medios.post.PostHolderFactory;
 import com.personal.medios.post.PostHolderFactoryManager;
-import com.personal.medios.post.VideoHolder;
+import com.personal.medios.post.PostHolderObservable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,7 @@ import retrofit2.Response;
      private boolean usedCursor = false;
      private ScreenSlidePagerAdapter pagerAdapter;
      static private RetrofitController apiController;
+     private PostHolderObservable postsObservable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,32 +50,36 @@ import retrofit2.Response;
             return insets;
         });
 
+        postsObservable = new PostHolderObservable();
         Intent i = getIntent();
 
         String ApiUrl = (String) Objects.requireNonNull(i.getExtras()).get("API_URL");
         apiController = new RetrofitController(ApiUrl);
         ViewPager2 viewPager = findViewById(R.id.swipe_container);
-        pagerAdapter = new ScreenSlidePagerAdapter(this);
+        pagerAdapter = new ScreenSlidePagerAdapter(this, postsObservable, apiController);
         viewPager.setAdapter(pagerAdapter);
         loadFeed();
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             private int myState;
-            private int currentPosition;
+            private int currentPosition, previousPosition;
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (myState == ViewPager2.SCROLL_STATE_SETTLING) {
+                if (myState == ViewPager2.SCROLL_STATE_SETTLING && position==currentPosition) {
                     Log.i("Swipe", "Settling: " + position + ", " + currentPosition);
+                    postsObservable.notifyVisible(currentPosition);
+                    postsObservable.notifySwipedFrom(previousPosition);
                     if (position==pagerAdapter.getItemCount()-1) loadFeed();
                 }
-                if (myState == ViewPager2.SCROLL_STATE_DRAGGING) {
-                    Log.i("Swipe", "Dragging: " + position + ", " + currentPosition);
-                }
+//                if (myState == ViewPager2.SCROLL_STATE_DRAGGING) {
+//                    Log.i("Swipe", "Dragging: " + position + ", " + currentPosition);
+//                }
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
             @Override
             public void onPageSelected(int position) {
+                previousPosition = currentPosition;
                 currentPosition = position;
                 super.onPageSelected(position);
             }
@@ -121,8 +126,13 @@ import retrofit2.Response;
 
         List<FeedModel> feed = new ArrayList<>();
         VideoActivity parent;
-        public ScreenSlidePagerAdapter(VideoActivity videoActivity){
+        private boolean initialized;
+        private PostHolderObservable postsObservable;
+        RetrofitController retrofitController;
+        public ScreenSlidePagerAdapter(VideoActivity videoActivity, PostHolderObservable o, RetrofitController retrofitController){
             parent = videoActivity;
+            postsObservable = o;
+            this.retrofitController = retrofitController;
         }
 
         @NonNull
@@ -131,7 +141,7 @@ import retrofit2.Response;
 //            return new VideoViewHolder(,apiController, feed.get(position));
             Log.i("Swipe", "New holder with view type: "+ viewType);
             PostHolderFactory factory = PostHolderFactoryManager.getFactory(viewType);
-            return factory.createPostHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.post_view, parent, false));
+            return factory.createPostHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.post_view, parent, false), postsObservable, retrofitController);
         }
 
 
@@ -154,8 +164,11 @@ import retrofit2.Response;
                 public void onResponse(Call<UserModel> call, Response<UserModel> response) {
                     UserModel um = response.body();
                     fm.setUserName(um.getName());
-                    Log.i("SwipeDebug", "Type: "+fm.getType());
                     holder.setInfo(fm);
+                    if (!initialized){
+                        holder.NotifySwipedTo();
+                        initialized = true;
+                    }
                 }
 
                 @Override

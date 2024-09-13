@@ -26,6 +26,7 @@ public interface VideoApi {
     @GET("users/{userId}")
     Call<UserModel> getUserById(@Path(value = "userId", encoded = true) int userId);
 
-    @GET("users/{audioTrackId}")
-    Call<AudioModel> getAudioById(@Path(value = "audioTrackId", encoded = true) int audioTrackId);
+
+    @POST("like/{audioId}")
+    Call<Void> likeVideo(@Path(value="audioId", encoded = true) int audioId);
 }

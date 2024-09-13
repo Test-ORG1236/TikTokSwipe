@@ -5,20 +5,19 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 
+import com.personal.medios.api.RetrofitController;
 import com.personal.medios.api.models.FeedModel;
 
 public class VideoHolder extends PostHolder{
 
     VideoView vv;
     @SuppressLint("ClickableViewAccessibility")
-    public VideoHolder(@NonNull View view){
-        super(view);
+    public VideoHolder(@NonNull View view, PostHolderObservable observer, RetrofitController rtc){
+        super(view,observer, rtc);
         vv = new VideoView(view.getContext());
         setupView(vv);
         vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
