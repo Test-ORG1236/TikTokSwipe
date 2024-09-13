@@ -15,10 +15,10 @@ import retrofit2.http.Query;
 
 public interface VideoApi {
     @GET("feed")
-    Call<FeedPageModel> getFeed();
+    Call<FeedPageModel> getFeed(@Query("presentable_mode") boolean presentableMode);
 
     @GET("feed")
-    Call<FeedPageModel> getFeed(@Query("cursor_token") String cursor_token);
+    Call<FeedPageModel> getFeed(@Query("cursor_token") String cursor_token, @Query("presentable_mode") boolean presentableMode);
 
     @GET("users")
     Call<List<UserModel>> getUsers();

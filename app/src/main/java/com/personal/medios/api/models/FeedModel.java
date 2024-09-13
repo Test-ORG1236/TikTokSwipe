@@ -13,6 +13,16 @@ public class FeedModel extends MetaInfoModel {
     private int userId, likes;
     private List<String> files;
     private AudioModel audio;
+    private boolean isPresentable;
+
+    public boolean isPresentable() {
+        return isPresentable;
+    }
+
+    public void setPresentable(boolean presentable) {
+        isPresentable = presentable;
+    }
+
     public String getAsString(){
         return "ID: "+getId()+", titulo: "+getTitle();
     }

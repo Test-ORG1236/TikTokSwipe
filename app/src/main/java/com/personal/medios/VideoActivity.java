@@ -38,6 +38,7 @@ import retrofit2.Response;
      private boolean usedCursor = false;
      private ScreenSlidePagerAdapter pagerAdapter;
      static private RetrofitController apiController;
+     private Boolean presentableMode;
      private PostHolderObservable postsObservable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ import retrofit2.Response;
         Intent i = getIntent();
 
         String ApiUrl = (String) Objects.requireNonNull(i.getExtras()).get("API_URL");
+        presentableMode = (Boolean) Objects.requireNonNull(i.getExtras()).get("PRESENTABLE_MODE");
         apiController = new RetrofitController(ApiUrl);
         ViewPager2 viewPager = findViewById(R.id.swipe_container);
         pagerAdapter = new ScreenSlidePagerAdapter(this, postsObservable, apiController);
@@ -95,9 +97,9 @@ import retrofit2.Response;
     public void loadFeed(){
         Call<FeedPageModel> callFeedPage;
         if (!usedCursor) {
-            if (nextCursor == null) callFeedPage = apiController.getVideoApi().getFeed();
+            if (nextCursor == null) callFeedPage = apiController.getVideoApi().getFeed(presentableMode);
             else {
-                callFeedPage = apiController.getVideoApi().getFeed(nextCursor);
+                callFeedPage = apiController.getVideoApi().getFeed(nextCursor,presentableMode);
                 usedCursor = true;
             }
 

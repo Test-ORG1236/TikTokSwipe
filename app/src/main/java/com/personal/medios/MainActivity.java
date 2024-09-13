@@ -9,6 +9,7 @@ import android.util.Log;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         etApiUrl = findViewById(R.id.url_api);
         tvErrorUrl = findViewById(R.id.error_url);
         btnComenzarAventura = findViewById(R.id.btn_comenzar);
+        CheckBox cb = (CheckBox) findViewById(R.id.presentable_cb);
 
         etApiUrl.addTextChangedListener(new TextWatcher() {
             @Override
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("URL", "URL válida " + ApiUrl);
             Intent i = new Intent(this, VideoActivity.class);
             i.putExtra("API_URL", ApiUrl);
+            i.putExtra("PRESENTABLE_MODE", cb.isChecked());
             startActivity(i);
 
         });

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.personal.medios.R;
 import com.personal.medios.api.RetrofitController;
+import com.personal.medios.api.models.AudioModel;
 import com.personal.medios.api.models.FeedModel;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import retrofit2.Response;
 
 public abstract class PostHolder extends RecyclerView.ViewHolder implements PostHolderObserver {
     FeedModel post;
-    TextView tvTituloVideo, tvAutorVideo, tvLikes;
+    private final TextView tvTituloVideo, tvAutorVideo, tvLikes, tvTituloAudio;
     ImageView heartImage;
     FrameLayout contentContainer;
     private RetrofitController rtc;
@@ -38,6 +39,7 @@ public abstract class PostHolder extends RecyclerView.ViewHolder implements Post
         tvLikes = view.findViewById(R.id.tvlikes);
         contentContainer = view.findViewById(R.id.content_container);
         heartImage = view.findViewById(R.id.heartImg);
+        tvTituloAudio = view.findViewById(R.id.titulo_audio);
         heartImage.setOnTouchListener((v, me) -> {
                 try {
                     likePost();
@@ -83,10 +85,16 @@ public abstract class PostHolder extends RecyclerView.ViewHolder implements Post
         tvTituloVideo.setText(post.getTitle());
         tvAutorVideo.setText(post.getUserName());
         tvLikes.setText(String.valueOf(post.getLikes()));
+        AudioModel audio = post.getAudio();
+        if (audio!=null){
+            tvTituloAudio.setText("Audio: " + audio.getTitle());
+        }else{
+            tvTituloAudio.setText("");
+        }
     }
-
     public void NotifySwipedTo(){
         Log.i("SwipeDebug", "Swiped into: "+tvTituloVideo.getText());
+
     }
     public void NotifySwipedFrom(){
         Log.i("SwipeDebug", "Swiped from: "+tvTituloVideo.getText());

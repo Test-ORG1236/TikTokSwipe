@@ -14,16 +14,16 @@ import com.personal.medios.R;
 
 public class PostWithAudioHolder extends PostHolder{
     private MediaPlayer audioPlayer = null;
-    private final TextView tvTituloAudio;
+
     public PostWithAudioHolder(@NonNull View view, PostHolderObservable o, RetrofitController rtc){
         super(view,o, rtc);
-        tvTituloAudio = view.findViewById(R.id.titulo_audio);
+
     }
     public void setupAudioPlayer(){
         if (audioPlayer==null && post!=null){
             AudioModel audio = post.getAudio();
             if (audio!=null) {
-                tvTituloAudio.setText("Audio: " + audio.getTitle());
+
                 audioPlayer = MediaPlayer.create(itemView.getContext(), audio.getUri());
                 audioPlayer.setLooping(true);
 
@@ -41,7 +41,7 @@ public class PostWithAudioHolder extends PostHolder{
     @Override
     public void NotifySwipedTo() {
         super.NotifySwipedTo();
-        if (audioPlayer !=null) {
+        if (post.getAudio()!=null && audioPlayer !=null) {
             Log.i("SwipeDebug", "play audio, "+audioPlayer);
             audioPlayer.seekTo(0);
             audioPlayer.start();
