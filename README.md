@@ -1,1 +1,1 @@
-Test
+Test of branch rules
